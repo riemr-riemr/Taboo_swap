@@ -162,8 +162,9 @@ def route_k_cost_sum(route_k):  #1台ずつの移動距離計算
     route_k_sum = 0
     for i in range(len(route_k) - 1):
         route_k_sum = route_k_sum + c[route_k[i]][route_k[i + 1]]
-    route_k_sum = route_k_sum + c[0][route_k[0]]
-    route_k_sum = route_k_sum + c[0][route_k[i + 1]]
+    if len(route_k) != 0:
+        route_k_sum = route_k_sum + c[0][route_k[0]]
+        route_k_sum = route_k_sum + c[0][route_k[i + 1]]
 
     return route_k_sum
 
@@ -492,8 +493,15 @@ def swap(route, requestnode):
                 change = copy.deepcopy(NEWroute)
             elif penalty_sum(NEWroute, requestnode)[2] < penalty_sum(change, requestnode)[2]:
                 change = copy.deepcopy(NEWroute)
+        for j in range(len(route[min_no])):
+            if route[min_no][j] <= int(requestnode/2):
+                NEWroute = copy.deepcopy(newRoute_ver2(change, requestnode, route[min_no][j], min_no, max_no))
+                if j == 0:
+                    change_saiteki = copy.deepcopy(NEWroute)
+                elif penalty_sum(NEWroute, requestnode)[2] < penalty_sum(change_saiteki, requestnode)[2]:
+                        change_saiteki = copy.deepcopy(NEWroute)
 
-    return change
+    return change_saiteki
 
 
 def main(LOOP):
@@ -551,25 +559,23 @@ def main(LOOP):
 
         data[loop] = opt
         loop += 1
+        swap_route = swap(saiteki_route, n)
+        if penalty_sum(swap_route, n)[2] <= penalty_sum(saiteki_route, n)[2]:
+            saiteki_route = copy.deepcopy(swap_route)
+            saiteki = penalty_sum(swap_route, n)[2]
         if loop == LOOP:
-            swap_route = swap(saiteki_route, n)
             break
 
-    pre_saiteki = saiteki
-    pre_saiteki_route = copy.deepcopy(saiteki_route)
-    if penalty_sum(swap_route, n)[2] <= penalty_sum(saiteki_route, n)[2]:
-        saiteki_route = copy.deepcopy(swap_route)
-        saiteki = penalty_sum(swap_route, n)[2]
 
     print(syoki)
-    print(saiteki_route, pre_saiteki_route)
+    print(saiteki_route)
     print(test, opt)
-    print(saiteki, pre_saiteki)
-    print(saiteki - penalty_sum(saiteki_route, n)[0], pre_saiteki - penalty_sum(pre_saiteki_route, n)[0])
-    print(penalty_sum(saiteki_route, n)[1], penalty_sum(pre_saiteki_route, n)[1])
+    print(saiteki)
+    print(saiteki - penalty_sum(saiteki_route, n)[0])
+    print(penalty_sum(saiteki_route, n)[1])
     print(keisu)
     print(FILENAME)
-    np.savetxt('/home/rei/ドキュメント/data_darp02/swap.ods', data, delimiter=",")
+    np.savetxt('/home/rei/ドキュメント/data_darp02/swap_ver2.ods', data, delimiter=",")
 
 
 if __name__ == '__main__':
@@ -593,6 +599,6 @@ if __name__ == '__main__':
 
     keisu = np.ones(4)
     t1 = time.time()
-    main(5000)
+    main(500)
     t2 = time.time()
     print(f"time:{t2 - t1}")
