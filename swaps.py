@@ -592,6 +592,6 @@ if __name__ == '__main__':
 
     keisu = np.ones(4)
     t1 = time.time()
-    main(500)
+    main(5000)
     t2 = time.time()
     print(f"time:{t2 - t1}")
