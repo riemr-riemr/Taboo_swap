@@ -488,20 +488,16 @@ def swap(route, requestnode):
 
     for i in range(len(route[max_no])):
         if route[max_no][i] <= int(requestnode / 2):
-            NEWroute = copy.deepcopy(newRoute_ver2(route, requestnode, route[max_no][i], max_no, min_no))
-            if i == 0:
-                change = copy.deepcopy(NEWroute)
-            elif penalty_sum(NEWroute, requestnode)[2] < penalty_sum(change, requestnode)[2]:
-                change = copy.deepcopy(NEWroute)
+            NEWroute_1 = copy.deepcopy(newRoute_ver2(route, requestnode, route[max_no][i], max_no, min_no))
         for j in range(len(route[min_no])):
             if route[min_no][j] <= int(requestnode/2):
-                NEWroute = copy.deepcopy(newRoute_ver2(change, requestnode, route[min_no][j], min_no, max_no))
+                NEWroute_2 = copy.deepcopy(newRoute_ver2(NEWroute_1, requestnode, route[min_no][j], min_no, max_no))
                 if j == 0:
-                    change_saiteki = copy.deepcopy(NEWroute)
-                elif penalty_sum(NEWroute, requestnode)[2] < penalty_sum(change_saiteki, requestnode)[2]:
-                        change_saiteki = copy.deepcopy(NEWroute)
+                    change_route = copy.deepcopy(NEWroute_2)
+                elif penalty_sum(NEWroute_2, requestnode)[2] < penalty_sum(change_route, requestnode)[2]:
+                        change_route = copy.deepcopy(NEWroute_2)
 
-    return change_saiteki
+    return change_route
 
 
 def main(LOOP):
