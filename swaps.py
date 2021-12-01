@@ -460,7 +460,7 @@ def tabu_check(riyoukyakunumber,vehiclenumber,tabu_list):
     check = 0
     for i in range(len(tabu_list)):  # ループ回数をtabu_listのサイズにあわせなければならない
         if tabu_list[i][0] == riyoukyakunumber and tabu_list[i][1] == vehiclenumber and tabu_list[i][
-            2] >= 0:  # たぶん間違い
+            2] >= 0:
             check += 1
     return  check
 
@@ -498,7 +498,7 @@ def swap(route, requestnode):
 
 
 def main(LOOP):
-    data = np.zeros(LOOP)
+    data = np.zeros((LOOP,2))
     initial_Route = initial_solution(n, m, Q_max)  # 初期解生成
     syoki = copy.deepcopy(initial_Route)
     opt = penalty_sum(initial_Route, n)[2]
@@ -550,12 +550,16 @@ def main(LOOP):
             delta = np.random.uniform(0, 0.5)
             parameta_loop = 0
 
-        data[loop] = opt
+        initial_Route = copy.deepcopy(swap(initial_Route, n))
+
+        if penalty_sum(initial_Route, n)[2] <= penalty_sum(saiteki_route, n)[2]:
+            saiteki_route = copy.deepcopy(initial_Route)
+            saiteki = penalty_sum(initial_Route, n)[2]
+            opt = saiteki
+
+        data[loop][0] = opt
+        data[loop][1] = time.time() - t1
         loop += 1
-        swap_route = swap(saiteki_route, n)
-        if penalty_sum(swap_route, n)[2] <= penalty_sum(saiteki_route, n)[2]:
-            saiteki_route = copy.deepcopy(swap_route)
-            saiteki = penalty_sum(swap_route, n)[2]
         if loop == LOOP:
             break
 
@@ -568,12 +572,15 @@ def main(LOOP):
     print(penalty_sum(saiteki_route, n)[1])
     print(keisu)
     print(FILENAME)
+    print('探索回数', tansaku)
     np.savetxt('/home/rei/ドキュメント/data_darp02/swaps.ods', data, delimiter=",")
 
 
 if __name__ == '__main__':
     FILENAME = 'darp02.txt'
     Setting_Info = Setting(FILENAME)[0]
+
+    tansaku = 500
 
     n = int(Setting(FILENAME)[1])  # depoを除いたノード数
     m = int(Setting_Info[0])  # 車両数
@@ -592,7 +599,7 @@ if __name__ == '__main__':
 
     keisu = np.ones(4)
     t1 = time.time()
-    main(5000)
+    main(tansaku)
 
     t2 = time.time()
     print(f"time:{t2 - t1}")
