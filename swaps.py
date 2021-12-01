@@ -478,6 +478,7 @@ def tabu_update_ver2(kinsi,tabu_list,neighbour):    #kinsiはその近傍を何�
 def swap(route, requestnode):
     max = 0
     min = 1000
+    best_neighbour = np.zeros(2)
     for i in range(len(route)):  # 初期解
         if max <= penalty_sum_route_k(route[i], requestnode):
             max = penalty_sum_route_k(route[i], requestnode)
@@ -493,8 +494,10 @@ def swap(route, requestnode):
                 change = copy.deepcopy(NEWroute)
             elif penalty_sum(NEWroute, requestnode)[2] < penalty_sum(change, requestnode)[2]:
                 change = copy.deepcopy(NEWroute)
+                best_neighbour[0] = i
+                best_neighbour[1] = max_no
 
-    return change
+    return change, best_neighbour
 
 
 def main(LOOP):
@@ -550,7 +553,9 @@ def main(LOOP):
             delta = np.random.uniform(0, 0.5)
             parameta_loop = 0
 
-        initial_Route = copy.deepcopy(swap(initial_Route, n))
+        swap_route = copy.deepcopy(swap(initial_Route, n))
+        initial_Route = copy.deepcopy(swap_route[0])
+        tabu_update_ver2(kinsi, tabu_list, swap_route[1])
 
         if penalty_sum(initial_Route, n)[2] <= penalty_sum(saiteki_route, n)[2]:
             saiteki_route = copy.deepcopy(initial_Route)
